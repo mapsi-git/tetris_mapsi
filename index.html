@@ -4,75 +4,119 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>테트리스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #7a7d84;
-    --panel: #5e6168;
-    --line: #8a8e96;
-    --text: #e6e8ee;
-    --muted: #d4d7dd;
-    --accent: #6ea8fe;
+    --bg: repeating-linear-gradient(90deg, #3f9b45 0 80px, #378c3d 80px 160px);
+    --panel: rgba(255, 255, 255, .9);
+    --line: #ffffff;
+    --text: #1d4a26;
+    --muted: #4f7d58;
+    --accent: #ff7a00;
+    --board: #2f8f3a;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     min-height: 100vh;
-    background: var(--bg);
+    background: #378c3d var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-family: "Jua", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px;
   }
   .game { display: flex; gap: 16px; align-items: flex-start; }
-  .side { display: flex; flex-direction: column; gap: 12px; width: 120px; }
+  .side { display: flex; flex-direction: column; gap: 12px; width: 140px; }
   .box {
     background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    border: 3px solid var(--line);
+    border-radius: 16px;
     padding: 10px;
+    box-shadow: 0 4px 12px rgba(0, 40, 10, .25);
   }
-  .label { font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-  .value { font-size: 20px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .label { font-size: 13px; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .value { font-size: 24px; font-variant-numeric: tabular-nums; font-weight: 700; }
   .board-wrap { position: relative; }
   canvas#board {
     display: block;
-    background: #44474e;
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    background: var(--board);
+    border: 4px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 40, 10, .4);
   }
   .overlay {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(68, 71, 78, .85);
-    border-radius: 8px;
+    background: rgba(14, 58, 24, .86);
+    border-radius: 16px;
     text-align: center;
     gap: 12px;
+    color: #fff;
   }
   .overlay.hidden { display: none; }
-  .overlay h1 { margin: 0; font-size: 28px; }
-  .overlay p { margin: 0; color: var(--muted); font-size: 14px; }
+  .overlay h1 { margin: 0; font-size: 34px; }
+  .overlay p { margin: 0; color: #d6f5d9; font-size: 15px; }
   button {
-    background: var(--accent); color: #0b0d12; border: 0; border-radius: 6px;
-    padding: 10px 20px; font-size: 15px; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #fff; border: 0; border-radius: 999px;
+    padding: 10px 24px; font-size: 16px; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 3px 0 #c45d00;
   }
-  .keys { font-size: 12px; color: var(--muted); line-height: 1.8; }
-  .keys b { color: var(--text); font-weight: 500; }
+  .keys { font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .keys b { color: var(--text); font-weight: 700; }
   .touch { display: none; gap: 8px; margin-top: 12px; justify-content: center; flex-wrap: wrap; }
-  .touch button { background: var(--panel); color: var(--text); border: 1px solid var(--line); min-width: 52px; }
+  .touch button { background: var(--panel); color: var(--text); border: 3px solid var(--line); min-width: 52px; box-shadow: none; }
   @media (max-width: 600px) {
     .game { flex-direction: column; align-items: center; }
     .side { flex-direction: row; width: auto; flex-wrap: wrap; justify-content: center; }
     .side .keys { display: none; }
     .touch { display: flex; }
   }
+  .timer .value { font-size: 28px; }
+  .timer.warn { background: #ffe3ef; border-color: var(--accent); animation: pulse 1s ease-in-out infinite; }
+  .timer.warn .value { color: #e0306e; }
+  @keyframes pulse { 50% { transform: scale(1.05); } }
+  .overlay .hidden { display: none; }
+  #name {
+    width: 70%; padding: 10px 14px; border: 3px solid #fff; border-radius: 999px;
+    font: inherit; font-size: 17px; text-align: center; color: var(--text); outline: none;
+  }
+  #name:focus { border-color: #ffd43b; }
+  #name.shake { animation: shake .4s; border-color: #ff6b6b; }
+  @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  #rank { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+  #rank li { display: flex; gap: 6px; padding: 3px 4px; border-radius: 6px; }
+  #rank li .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #rank li .pts { font-variant-numeric: tabular-nums; }
+  #rank li.me { background: #ffe066; }
+  .goal {
+    position: absolute; left: 50%; top: 40%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; text-align: center; white-space: nowrap;
+    font-size: 52px; color: #ffd43b; letter-spacing: .02em;
+    -webkit-text-stroke: 2px #1d4a26;
+    text-shadow: 0 4px 0 #1d4a26, 0 8px 18px rgba(0, 0, 0, .45);
+    animation: goal 1.1s ease-out forwards;
+  }
+  .goal small { display: block; font-size: 26px; color: #fff; -webkit-text-stroke: 1px #1d4a26; }
+  @keyframes goal {
+    0% { transform: translate(-50%, -50%) scale(.2) rotate(-12deg); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.25) rotate(4deg); opacity: 1; }
+    35% { transform: translate(-50%, -50%) scale(1) rotate(0); }
+    75% { opacity: 1; }
+    100% { transform: translate(-50%, -80%) scale(1); opacity: 0; }
+  }
+  #rank .empty { color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
 <div>
   <div class="game">
     <div class="side">
+      <div class="box timer" id="timer-box"><div class="label">남은 시간</div><div class="value" id="timer">5:00</div></div>
       <div class="box"><div class="label">홀드 (C)</div><canvas id="hold" width="96" height="64"></canvas></div>
       <div class="box"><div class="label">점수</div><div class="value" id="score">0</div></div>
       <div class="box"><div class="label">라인</div><div class="value" id="lines">0</div></div>
@@ -81,15 +125,18 @@
 
     <div class="board-wrap">
       <canvas id="board" width="300" height="600"></canvas>
+      <div id="goal-layer"></div>
       <div class="overlay" id="overlay">
-        <h1 id="ov-title">테트리스</h1>
-        <p id="ov-text">Enter 또는 버튼을 눌러 시작</p>
+        <h1 id="ov-title">⚽ 테트리스</h1>
+        <p id="ov-text">이름을 쓰고 시작을 눌러요</p>
+        <input id="name" maxlength="8" placeholder="이름" autocomplete="off">
         <button id="start">시작</button>
       </div>
     </div>
 
     <div class="side">
       <div class="box"><div class="label">다음</div><canvas id="next" width="96" height="232"></canvas></div>
+      <div class="box"><div class="label">🏆 순위</div><ol id="rank"></ol></div>
       <div class="box keys">
         <b>← →</b> 이동<br>
         <b>↓</b> 소프트 드롭<br>
@@ -114,9 +161,16 @@
 <script>
 (() => {
   const COLS = 10, ROWS = 20, SIZE = 30;
-  const COLORS = {
-    I: '#4dd0e1', O: '#ffd54f', T: '#ba68c8', S: '#81c784',
-    Z: '#e57373', J: '#64b5f6', L: '#ffb74d'
+  // Each piece is a K League club, drawn as an original shield badge in the
+  // club's colors (not the official emblem): main fill, center stripe, short name
+  const TEAMS = {
+    I: { name: '서울', main: '#1a1a1a', stripe: '#c8102e' },
+    O: { name: '전북', main: '#00704a', stripe: '#c5d82e' },
+    T: { name: '대전', main: '#009b8f', stripe: '#7b1f45' },
+    S: { name: '제주', main: '#f26b1d', stripe: '#2a2a2a' },
+    Z: { name: '안양', main: '#5b2d8e', stripe: '#b89ad9' },
+    J: { name: '부천', main: '#d0102f', stripe: '#111111' },
+    L: { name: '울산', main: '#0a4ea2', stripe: '#f5c400' }
   };
   const SHAPES = {
     I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
@@ -161,13 +215,62 @@
   const scoreEl = document.getElementById('score');
   const linesEl = document.getElementById('lines');
   const levelEl = document.getElementById('level');
+  const timerEl = document.getElementById('timer');
+  const timerBox = document.getElementById('timer-box');
+
+  // Each player's game lasts at most 5 minutes of play (the clock stops while paused);
+  // when it runs out the game ends and the score goes to the ranking like a game over.
+  const GAME_TIME = 5 * 60 * 1000;
+  let timeLeft = GAME_TIME;
+  try { localStorage.removeItem('tetris-session-start'); } catch (e) {} // old 10-minute lock
 
   let grid, piece, queue, bag, holdType, canHold;
   let score, lines, level, dropTimer, lockTimer, lockMoves;
   let state = 'idle'; // idle | playing | paused | over
   let lastTime = 0;
-  let best = 0;
-  try { best = Number(localStorage.getItem('tetris-best')) || 0; } catch (e) {}
+  const nameInput = document.getElementById('name');
+  const rankEl = document.getElementById('rank');
+  const RANK_KEY = 'tetris-ranking';
+  const NAME_KEY = 'tetris-player';
+  let ranking = [];
+  try { ranking = JSON.parse(localStorage.getItem(RANK_KEY)) || []; } catch (e) {}
+  try { nameInput.value = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
+  let playerName = '';
+  let scoreSaved = true;
+
+  // Adds the finished game to the top 5; returns its rank (1-5) or 0 if it didn't make it
+  function saveScore() {
+    if (scoreSaved) return 0;
+    scoreSaved = true;
+    if (score <= 0) return 0;
+    const entry = { name: playerName, score, at: Date.now() };
+    ranking = [...ranking, entry].sort((a, b) => b.score - a.score || a.at - b.at).slice(0, 5);
+    try { localStorage.setItem(RANK_KEY, JSON.stringify(ranking)); } catch (e) {}
+    const rank = ranking.indexOf(entry) + 1;
+    renderRanking(entry);
+    return rank;
+  }
+
+  function renderRanking(highlight) {
+    const medals = ['🥇', '🥈', '🥉', '4', '5'];
+    rankEl.replaceChildren();
+    if (!ranking.length) {
+      rankEl.innerHTML = '<li class="empty">아직 기록이 없어요</li>';
+      return;
+    }
+    ranking.forEach((r, i) => {
+      const li = document.createElement('li');
+      if (r === highlight) li.className = 'me';
+      const who = document.createElement('span');
+      who.className = 'who';
+      who.textContent = `${medals[i]} ${r.name}`;
+      const pts = document.createElement('span');
+      pts.className = 'pts';
+      pts.textContent = r.score;
+      li.append(who, pts);
+      rankEl.append(li);
+    });
+  }
 
   const emptyGrid = () => Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
@@ -288,10 +391,26 @@
       }
     }
     if (cleared) {
-      score += LINE_SCORES[cleared] * level;
+      const points = LINE_SCORES[cleared] * level;
+      score += points;
       lines += cleared;
       level = Math.floor(lines / 10) + 1;
+      showGoal(cleared, points);
     }
+  }
+
+  const GOAL_TEXT = ['', 'GOAL!', 'DOUBLE GOAL!', 'TRIPLE GOAL!', 'SUPER GOAL!'];
+  function showGoal(cleared, points) {
+    const el = document.createElement('div');
+    el.className = 'goal';
+    el.textContent = `⚽ ${GOAL_TEXT[cleared]}`;
+    if (cleared > 1) el.style.fontSize = '34px'; // longer phrases must fit the 300px board
+    const sub = document.createElement('small');
+    sub.textContent = `+${points}점`;
+    el.append(sub);
+    const layer = document.getElementById('goal-layer');
+    layer.replaceChildren(el);
+    el.addEventListener('animationend', () => el.remove());
   }
 
   const dropInterval = () => Math.max(50, 1000 * Math.pow(0.8 - (level - 1) * 0.007, level - 1));
@@ -303,38 +422,120 @@
   }
 
   // ---------- drawing ----------
-  function drawCell(c, x, y, color, size, alpha = 1) {
+  let sprites = {};
+  // badges drawn before the web font arrives use a fallback font; redraw once it loads
+  document.fonts?.ready.then(() => { sprites = {}; });
+  function shieldPath(c, size) {
+    const p = size * 0.1, l = p, r = size - p, t = p, w = r - l;
+    c.beginPath();
+    c.moveTo(l + w * 0.12, t);
+    c.lineTo(r - w * 0.12, t);
+    c.quadraticCurveTo(r, t, r, t + w * 0.12);
+    c.lineTo(r, size * 0.52);
+    c.quadraticCurveTo(r, size * 0.8, size / 2, size - p * 0.6);
+    c.quadraticCurveTo(l, size * 0.8, l, size * 0.52);
+    c.lineTo(l, t + w * 0.12);
+    c.quadraticCurveTo(l, t, l + w * 0.12, t);
+    c.closePath();
+  }
+
+  function badgeSprite(type, size) {
+    const key = type + size;
+    if (sprites[key]) return sprites[key];
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const c = cv.getContext('2d');
+    const team = TEAMS[type];
+    // light tile so the badge stands out on the grass
+    c.fillStyle = 'rgba(255, 255, 255, .85)';
+    c.beginPath();
+    c.roundRect(1, 1, size - 2, size - 2, size * 0.2);
+    c.fill();
+    // shield: main color with a center stripe, white rim
+    shieldPath(c, size);
+    c.fillStyle = team.main;
+    c.fill();
+    c.save();
+    c.clip();
+    c.fillStyle = team.stripe;
+    c.fillRect(size * 0.38, 0, size * 0.24, size);
+    c.restore();
+    shieldPath(c, size);
+    c.strokeStyle = '#fff';
+    c.lineWidth = Math.max(1, size * 0.06);
+    c.stroke();
+    // club name only where it is readable (board tiles, not the small previews)
+    if (size >= 24) {
+      c.font = `${Math.round(size * 0.34)}px "Jua", "Apple SD Gothic Neo", sans-serif`;
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.lineWidth = 3;
+      c.strokeStyle = 'rgba(0, 0, 0, .7)';
+      c.strokeText(team.name, size / 2, size * 0.47);
+      c.fillStyle = '#fff';
+      c.fillText(team.name, size / 2, size * 0.47);
+    }
+    return (sprites[key] = cv);
+  }
+
+  function drawCell(c, x, y, type, size, alpha = 1) {
     c.globalAlpha = alpha;
-    c.fillStyle = color;
-    c.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-    c.fillStyle = 'rgba(255,255,255,.18)';
-    c.fillRect(x * size + 1, y * size + 1, size - 2, 3);
+    c.drawImage(badgeSprite(type, size), x * size, y * size);
     c.globalAlpha = 1;
   }
 
   function draw() {
-    ctx.clearRect(0, 0, board.width, board.height);
-    ctx.strokeStyle = '#52555c';
-    for (let x = 1; x < COLS; x++) { ctx.beginPath(); ctx.moveTo(x * SIZE + .5, 0); ctx.lineTo(x * SIZE + .5, ROWS * SIZE); ctx.stroke(); }
-    for (let y = 1; y < ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y * SIZE + .5); ctx.lineTo(COLS * SIZE, y * SIZE + .5); ctx.stroke(); }
+    drawPitch();
 
-    grid.forEach((row, y) => row.forEach((t, x) => { if (t) drawCell(ctx, x, y, COLORS[t], SIZE); }));
+    grid.forEach((row, y) => row.forEach((t, x) => { if (t) drawCell(ctx, x, y, t, SIZE); }));
 
     if (piece && state !== 'over') {
       const gy = ghostY();
       piece.shape.forEach((row, r) => row.forEach((v, c) => {
-        if (v && gy + r >= 0) drawCell(ctx, piece.x + c, gy + r, COLORS[piece.type], SIZE, 0.22);
+        if (v && gy + r >= 0) drawCell(ctx, piece.x + c, gy + r, piece.type, SIZE, 0.22);
       }));
       piece.shape.forEach((row, r) => row.forEach((v, c) => {
-        if (v && piece.y + r >= 0) drawCell(ctx, piece.x + c, piece.y + r, COLORS[piece.type], SIZE);
+        if (v && piece.y + r >= 0) drawCell(ctx, piece.x + c, piece.y + r, piece.type, SIZE);
       }));
     }
 
+    timerEl.textContent = fmt(timeLeft);
+    timerBox.classList.toggle('warn', state === 'playing' && timeLeft <= 60 * 1000);
     scoreEl.textContent = score;
     linesEl.textContent = lines;
     levelEl.textContent = level;
     drawMini(holdCtx, holdType ? [holdType] : [], canHold ? 1 : 0.35);
     drawMini(nextCtx, queue.slice(0, 4), 1);
+  }
+
+  function drawPitch() {
+    const W = COLS * SIZE, H = ROWS * SIZE;
+    // mowed grass stripes, two rows each
+    for (let y = 0; y < ROWS; y += 2) {
+      ctx.fillStyle = (y / 2) % 2 ? '#2f8f3a' : '#37a043';
+      ctx.fillRect(0, y * SIZE, W, SIZE * 2);
+    }
+    ctx.strokeStyle = 'rgba(0, 0, 0, .07)';
+    ctx.lineWidth = 1;
+    for (let x = 1; x < COLS; x++) { ctx.beginPath(); ctx.moveTo(x * SIZE + .5, 0); ctx.lineTo(x * SIZE + .5, H); ctx.stroke(); }
+    for (let y = 1; y < ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y * SIZE + .5); ctx.lineTo(W, y * SIZE + .5); ctx.stroke(); }
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, .55)';
+    ctx.fillStyle = 'rgba(255, 255, 255, .55)';
+    ctx.lineWidth = 3;
+    const m = 8;
+    ctx.strokeRect(m, m, W - m * 2, H - m * 2);
+    ctx.beginPath(); ctx.moveTo(m, H / 2); ctx.lineTo(W - m, H / 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(W / 2, H / 2, 50, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(W / 2, H / 2, 4, 0, Math.PI * 2); ctx.fill();
+    for (const top of [true, false]) {
+      const edge = top ? m : H - m, dir = top ? 1 : -1;
+      ctx.strokeRect(W / 2 - 90, edge, 180, 90 * dir);   // penalty box
+      ctx.strokeRect(W / 2 - 45, edge, 90, 32 * dir);    // goal box
+      ctx.beginPath(); ctx.arc(W / 2, edge + 64 * dir, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(W / 2, edge + 64 * dir, 42, top ? 0.2 * Math.PI : 1.2 * Math.PI, top ? 0.8 * Math.PI : 1.8 * Math.PI);
+      ctx.stroke();
+    }
   }
 
   function drawMini(c, types, alpha) {
@@ -350,13 +551,19 @@
       const ox = (c.canvas.width - w) / 2, oy = i * 58 + (58 - h) / 2 + 3;
       c.save();
       c.translate(ox - minX * s, oy - minY * s);
-      cells.forEach(([x, y]) => drawCell(c, x, y, COLORS[t], s, alpha));
+      cells.forEach(([x, y]) => drawCell(c, x, y, t, s, alpha));
       c.restore();
     });
   }
 
   // ---------- loop ----------
   function update(dt) {
+    timeLeft -= dt;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      endGame('⏰ 시간 끝!');
+      return;
+    }
     dropTimer += dt;
     if (dropTimer >= dropInterval()) {
       dropTimer = 0;
@@ -378,7 +585,27 @@
     requestAnimationFrame(loop);
   }
 
+  const fmt = ms => {
+    const s = Math.ceil(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  };
+
   function start() {
+    const name = nameInput.value.trim();
+    if (!name) {
+      ovText.textContent = '이름을 먼저 써 주세요!';
+      nameInput.classList.remove('shake');
+      void nameInput.offsetWidth; // restart the shake animation
+      nameInput.classList.add('shake');
+      nameInput.focus();
+      return;
+    }
+    playerName = name;
+    try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
+    nameInput.blur();
+    scoreSaved = false;
+    renderRanking();
+    timeLeft = GAME_TIME;
     grid = emptyGrid();
     bag = [];
     queue = [nextFromBag(), nextFromBag(), nextFromBag(), nextFromBag(), nextFromBag()];
@@ -390,9 +617,16 @@
   }
 
   function gameOver() {
+    endGame('게임 오버');
+  }
+
+  function endGame(title) {
     state = 'over';
-    if (score > best) { best = score; try { localStorage.setItem('tetris-best', best); } catch (e) {} }
-    showOverlay('게임 오버', `점수 ${score} · 최고 ${best}`, '다시 시작');
+    const rank = saveScore();
+    showOverlay(title, rank ? `${playerName} ${score}점 · ${rank}등 기록! 🎉` : `${playerName} ${score}점`, '다음 사람 시작', true);
+    // the next player can type their name straight over the previous one
+    nameInput.focus();
+    nameInput.select();
   }
 
   function togglePause() {
@@ -400,8 +634,9 @@
     else if (state === 'paused') { state = 'playing'; overlay.classList.add('hidden'); }
   }
 
-  function showOverlay(title, text, btn) {
+  function showOverlay(title, text, btn, askName = false) {
     ovTitle.textContent = title; ovText.textContent = text; startBtn.textContent = btn;
+    nameInput.classList.toggle('hidden', !askName);
     overlay.classList.remove('hidden');
   }
 
@@ -423,6 +658,11 @@
   };
 
   document.addEventListener('keydown', e => {
+    if (e.target === nameInput) {
+      // let the child type freely; Enter (after Korean IME composition) starts the game
+      if (e.key === 'Enter' && !e.isComposing) start();
+      return;
+    }
     if (e.key === 'Enter' && state !== 'playing') { state === 'paused' ? togglePause() : start(); return; }
     if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') { togglePause(); return; }
     const act = KEYMAP[e.key];
@@ -438,7 +678,7 @@
 
   grid = emptyGrid(); queue = []; holdType = null; canHold = true;
   score = 0; lines = 0; level = 1;
-  if (best) ovText.textContent = `최고 점수 ${best} · Enter 를 눌러 시작`;
+  renderRanking();
   requestAnimationFrame(loop);
 })();
 </script>
